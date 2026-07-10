@@ -1,87 +1,506 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
-	<title>Квадратное уравнение — интерфейс</title>
+	<title>Решение квадратного уравнения</title>
 	<style>
-		body{font-family:Segoe UI,Arial,Helvetica,sans-serif;margin:24px}
-		label{display:block;margin:8px 0 4px}
-		input[type=number]{width:120px;padding:6px}
-		button{margin-top:12px;padding:8px 12px}
-		#out{margin-top:16px;padding:10px;border:1px solid #ddd;background:#f9f9f9}
+		* {
+			box-sizing: border-box;
+		}
+		
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			min-height: 100vh;
+			padding: 20px;
+			margin: 0;
+		}
+		
+		.container {
+			max-width: 900px;
+			margin: 0 auto;
+			background: white;
+			border-radius: 12px;
+			box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+			padding: 40px;
+		}
+		
+		h1 {
+			color: #333;
+			margin: 0 0 10px 0;
+			font-size: 28px;
+		}
+		
+		.description {
+			color: #666;
+			margin: 0 0 30px 0;
+			font-size: 16px;
+		}
+		
+		.input-section {
+			background: #f8f9fa;
+			padding: 25px;
+			border-radius: 8px;
+			margin-bottom: 30px;
+		}
+		
+		.input-group {
+			display: flex;
+			gap: 30px;
+			margin-bottom: 20px;
+			flex-wrap: wrap;
+		}
+		
+		.input-field {
+			flex: 1;
+			min-width: 120px;
+		}
+		
+		label {
+			display: block;
+			font-weight: 600;
+			margin-bottom: 6px;
+			color: #333;
+			font-size: 14px;
+		}
+		
+		input[type="number"] {
+			width: 100%;
+			padding: 10px;
+			border: 2px solid #ddd;
+			border-radius: 6px;
+			font-size: 16px;
+			transition: border-color 0.3s;
+		}
+		
+		input[type="number"]:focus {
+			outline: none;
+			border-color: #667eea;
+		}
+		
+		.button-group {
+			display: flex;
+			gap: 10px;
+			align-items: center;
+			flex-wrap: wrap;
+		}
+		
+		button {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			color: white;
+			border: none;
+			padding: 12px 24px;
+			border-radius: 6px;
+			font-size: 16px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: transform 0.2s, box-shadow 0.2s;
+		}
+		
+		button:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+		}
+		
+		button:active {
+			transform: translateY(0);
+		}
+		
+		#status {
+			color: #667eea;
+			font-weight: 500;
+			font-size: 14px;
+		}
+		
+		.output-section {
+			display: none;
+		}
+		
+		.output-section.active {
+			display: block;
+		}
+		
+		.method {
+			background: #f8f9fa;
+			padding: 20px;
+			border-radius: 8px;
+			margin-bottom: 20px;
+			border-left: 4px solid #667eea;
+		}
+		
+		.method h3 {
+			margin: 0 0 15px 0;
+			color: #333;
+			font-size: 18px;
+		}
+		
+		.result {
+			background: white;
+			padding: 15px;
+			border-radius: 6px;
+			margin-bottom: 10px;
+			color: #333;
+			font-size: 15px;
+		}
+		
+		.result.success {
+			border-left: 4px solid #10b981;
+			background: #f0fdf4;
+		}
+		
+		.result.error {
+			border-left: 4px solid #ef4444;
+			background: #fef2f2;
+		}
+		
+		.result.info {
+			border-left: 4px solid #3b82f6;
+			background: #eff6ff;
+		}
+		
+		.vieta-verification {
+			background: white;
+			padding: 15px;
+			border-radius: 6px;
+			border-left: 4px solid #f59e0b;
+		}
+		
+		.vieta-row {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 8px 0;
+			font-size: 14px;
+			color: #555;
+		}
+		
+		.vieta-label {
+			font-weight: 500;
+			min-width: 200px;
+		}
+		
+		.vieta-value {
+			font-family: 'Monaco', 'Courier New', monospace;
+			color: #667eea;
+		}
+		
+		.verification-status {
+			text-align: center;
+			padding: 10px;
+			margin-top: 10px;
+			border-radius: 4px;
+			font-weight: 600;
+			font-size: 14px;
+		}
+		
+		.verification-status.verified {
+			background: #d1fae5;
+			color: #065f46;
+		}
+		
+		.verification-status.failed {
+			background: #fee2e2;
+			color: #991b1b;
+		}
 	</style>
 </head>
 <body>
-	<h1>Решение квадратного уравнения</h1>
-	<p>Введите коэффициенты уравнения <strong>ax² + bx + c = 0</strong> и нажмите «Решить».</p>
+	<div class="container">
+		<h1>Решение квадратного уравнения</h1>
+		<p class="description">
+			Введите коэффициенты уравнения <strong>ax² + bx + c = 0</strong> и нажмите «Решить»
+		</p>
 
-	<div>
-		<label for="a">a</label>
-		<input id="a" type="number" step="any" value="1">
-		<label for="b">b</label>
-		<input id="b" type="number" step="any" value="-3">
-		<label for="c">c</label>
-		<input id="c" type="number" step="any" value="2">
-		<div>
-			<button id="solve">Решить</button>
-			<span id="status" style="margin-left:12px;color:#666">Загрузка Pyodide...</span>
+		<div class="input-section">
+			<div class="input-group">
+				<div class="input-field">
+					<label for="a">Коэффициент a</label>
+					<input id="a" type="number" step="any" value="1">
+				</div>
+				<div class="input-field">
+					<label for="b">Коэффициент b</label>
+					<input id="b" type="number" step="any" value="-5">
+				</div>
+				<div class="input-field">
+					<label for="c">Коэффициент c</label>
+					<input id="c" type="number" step="any" value="6">
+				</div>
+			</div>
+			<div class="button-group">
+				<button id="solve">Решить</button>
+				<span id="status">Загружаю Pyodide...</span>
+			</div>
 		</div>
-	</div>
 
-	<div id="out">Результат появится здесь.</div>
+		<div id="output" class="output-section"></div>
+	</div>
 
 	<script>
 		const status = document.getElementById('status');
-		const out = document.getElementById('out');
+		const output = document.getElementById('output');
 		let pyodide = null;
 
-		async function initPyodide(){
-			status.textContent = 'Загружаю Pyodide...';
-			pyodide = await loadPyodide({indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.23.4/full/'});
-			status.textContent = 'Подгружаю модуль discriminant.py...';
-			const resp = await fetch('discriminant.py');
-			const code = await resp.text();
+		const pythonCode = `
+import math
+import json
 
-			// Создаём модуль discriminant из текста файла
-			const wrapper = `import types, sys
-		module = types.ModuleType('discriminant')\nexec(r'''${code}''', module.__dict__)\nsys.modules['discriminant']=module\nglobals()['discriminant']=module`;
-			await pyodide.runPythonAsync(wrapper);
-			status.textContent = 'Готово';
-		}
+def solve_vieta(a, b, c):
+	"""
+	Решение квадратного уравнения с использованием теоремы Виета.
+	По теореме Виета для уравнения ax² + bx + c = 0:
+	- Сумма корней: x1 + x2 = -b/a
+	- Произведение корней: x1 * x2 = c/a
+	"""
+	eps = 1e-12
+	a = float(a)
+	b = float(b)
+	c = float(c)
 
-		async function solve(){
-			if(!pyodide){ out.textContent = 'Pyodide не загружен'; return }
-			const a = parseFloat(document.getElementById('a').value);
-			const b = parseFloat(document.getElementById('b').value);
-			const c = parseFloat(document.getElementById('c').value);
-			status.textContent = 'Вычисляю...';
+	if abs(a) < eps:
+		# линейное или вырожденное уравнение
+		if abs(b) < eps:
+			if abs(c) < eps:
+				return json.dumps({"type": "infinite"})
+			return json.dumps({"type": "no_roots"})
+		x = -c / b
+		return json.dumps({"type": "one_root", "x": float(x)})
 
-			try{
-				const result = await pyodide.runPythonAsync(`discriminant.solve(${a}, ${b}, ${c})`);
-				// Преобразование результата: Pyodide отдаёт JS-объекты
-				if(Array.isArray(result) && result.length === 0){
-					out.textContent = 'Корней нет';
-				} else if(Array.isArray(result) && result.length === 1 && result[0] === 'infinite'){
-					out.textContent = 'Бесконечно много решений';
-				} else if(Array.isArray(result) && result.length === 1){
-					out.textContent = `Один корень: ${Number(result[0]).toFixed(6)}`;
-				} else if(Array.isArray(result) && result.length === 2){
-					out.textContent = `Два корня: x1 = ${Number(result[0]).toFixed(6)}, x2 = ${Number(result[1]).toFixed(6)}`;
-				} else {
-					out.textContent = String(result);
-				}
-			} catch(err){
-				out.textContent = 'Ошибка: ' + err;
-			} finally{
-				status.textContent = 'Готово';
+	# Вычисляем дискриминант
+	d = b * b - 4 * a * c
+	if d < -eps:
+		return json.dumps({"type": "no_roots"})
+	if abs(d) <= eps:
+		x = -b / (2 * a)
+		return json.dumps({"type": "one_root", "x": float(x)})
+
+	# Находим оба корня
+	sqrt_d = math.sqrt(d)
+	x1 = (-b + sqrt_d) / (2 * a)
+	x2 = (-b - sqrt_d) / (2 * a)
+	
+	# Проверяем теорему Виета
+	sum_roots = x1 + x2
+	product_roots = x1 * x2
+	
+	expected_sum = -b / a
+	expected_product = c / a
+	
+	verified = (abs(sum_roots - expected_sum) < eps and 
+				abs(product_roots - expected_product) < eps)
+	
+	return json.dumps({
+		"type": "two_roots",
+		"x1": float(x1),
+		"x2": float(x2),
+		"sum": float(sum_roots),
+		"expected_sum": float(expected_sum),
+		"product": float(product_roots),
+		"expected_product": float(expected_product),
+		"verified": verified
+	})
+
+
+def solve(a, b, c):
+	eps = 1e-12
+	a = float(a)
+	b = float(b)
+	c = float(c)
+
+	if abs(a) < eps:
+		# линейное или вырожденное уравнение
+		if abs(b) < eps:
+			if abs(c) < eps:
+				return json.dumps({"type": "infinite"})
+			return json.dumps({"type": "no_roots"})
+		x = -c / b
+		return json.dumps({"type": "one_root", "x": float(x)})
+
+	d = b * b - 4 * a * c
+	if d < -eps:
+		return json.dumps({"type": "no_roots"})
+	if abs(d) <= eps:
+		x = -b / (2 * a)
+		return json.dumps({"type": "one_root", "x": float(x)})
+
+	sqrt_d = math.sqrt(d)
+	x1 = (-b + sqrt_d) / (2 * a)
+	x2 = (-b - sqrt_d) / (2 * a)
+	
+	return json.dumps({
+		"type": "two_roots",
+		"x1": float(x1),
+		"x2": float(x2)
+	})
+`;
+
+		async function initPyodide() {
+			try {
+				status.textContent = 'Загружаю Pyodide...';
+				pyodide = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.23.4/full/' });
+				
+				status.textContent = 'Инициализирую модуль...';
+				await pyodide.runPythonAsync(pythonCode);
+				
+				status.textContent = 'Готово ✓';
+				document.getElementById('solve').disabled = false;
+			} catch (err) {
+				status.textContent = 'Ошибка при загрузке: ' + err.message;
+				console.error(err);
 			}
 		}
 
-		document.getElementById('solve').addEventListener('click', solve);
+		async function solveEquation() {
+			if (!pyodide) {
+				output.innerHTML = '<div class="result error">Pyodide не загружен</div>';
+				return;
+			}
+
+			const a = parseFloat(document.getElementById('a').value);
+			const b = parseFloat(document.getElementById('b').value);
+			const c = parseFloat(document.getElementById('c').value);
+
+			if (isNaN(a) || isNaN(b) || isNaN(c)) {
+				output.innerHTML = '<div class="result error">Пожалуйста, введите корректные числа</div>';
+				return;
+			}
+
+			status.textContent = 'Вычисляю...';
+			output.innerHTML = '';
+
+			try {
+				// Решение через дискриминант
+				const discriminantResultJSON = await pyodide.runPythonAsync(
+					`solve(${a}, ${b}, ${c})`
+				);
+				const discriminantResult = JSON.parse(discriminantResultJSON);
+
+				// Решение через теорему Виета
+				const vietaResultJSON = await pyodide.runPythonAsync(
+					`solve_vieta(${a}, ${b}, ${c})`
+				);
+				const vietaResult = JSON.parse(vietaResultJSON);
+
+				let html = '';
+
+				// Метод дискриминанта
+				html += '<div class="method">';
+				html += '<h3>📐 Решение через дискриминант</h3>';
+				html += formatResult(discriminantResult);
+				html += '</div>';
+
+				// Метод Виета
+				html += '<div class="method">';
+				html += '<h3>✓ Решение по теореме Виета</h3>';
+				html += formatVietaResult(vietaResult);
+				html += '</div>';
+
+				output.innerHTML = html;
+				output.classList.add('active');
+			} catch (err) {
+				output.innerHTML = `<div class="result error">Ошибка: ${err.message}</div>`;
+				output.classList.add('active');
+				console.error(err);
+			} finally {
+				status.textContent = 'Готово ✓';
+			}
+		}
+
+		function formatResult(result) {
+			if (!result || typeof result !== 'object') {
+				console.error('Invalid result type:', typeof result, result);
+				return `<div class="result error">Ошибка: неожиданный результат</div>`;
+			}
+
+			const type = result.type;
+
+			if (type === 'no_roots') {
+				return `<div class="result error">Корней нет (дискриминант < 0)</div>`;
+			}
+
+			if (type === 'infinite') {
+				return `<div class="result info">Бесконечно много решений</div>`;
+			}
+
+			if (type === 'one_root') {
+				const x = Number(result.x).toFixed(6);
+				return `<div class="result success"><strong>Один корень:</strong> x = ${x}</div>`;
+			}
+
+			if (type === 'two_roots') {
+				const x1 = Number(result.x1).toFixed(6);
+				const x2 = Number(result.x2).toFixed(6);
+				return `<div class="result success"><strong>Два корня:</strong> x₁ = ${x1}, x₂ = ${x2}</div>`;
+			}
+
+			console.error('Unknown result type:', type, result);
+			return `<div class="result error">Неизвестный тип результата: ${type}</div>`;
+		}
+
+		function formatVietaResult(result) {
+			if (!result || typeof result !== 'object') {
+				console.error('Invalid vieta result type:', typeof result, result);
+				return `<div class="result error">Ошибка: неожиданный результат</div>`;
+			}
+
+			const type = result.type;
+
+			if (type === 'no_roots') {
+				return `<div class="result error">Корней нет (дискриминант < 0)</div>`;
+			}
+
+			if (type === 'infinite') {
+				return `<div class="result info">Бесконечно много решений</div>`;
+			}
+
+			if (type === 'one_root') {
+				const x = Number(result.x).toFixed(6);
+				return `<div class="result success"><strong>Один корень:</strong> x = ${x}</div>`;
+			}
+
+			if (type === 'two_roots') {
+				const x1 = Number(result.x1).toFixed(6);
+				const x2 = Number(result.x2).toFixed(6);
+
+				let html = `<div class="result success"><strong>Два корня:</strong> x₁ = ${x1}, x₂ = ${x2}</div>`;
+
+				html += '<div class="vieta-verification">';
+				html += '<strong>Проверка теоремы Виета:</strong>';
+				html += '<div class="vieta-row">';
+				html += `<span class="vieta-label">Сумма корней (x₁ + x₂):</span>`;
+				html += `<span class="vieta-value">${Number(result.sum).toFixed(6)}</span>`;
+				html += '</div>';
+				html += '<div class="vieta-row">';
+				html += `<span class="vieta-label">Ожидаемая сумма (-b/a):</span>`;
+				html += `<span class="vieta-value">${Number(result.expected_sum).toFixed(6)}</span>`;
+				html += '</div>';
+				html += '<div class="vieta-row">';
+				html += `<span class="vieta-label">Произведение корней (x₁ × x₂):</span>`;
+				html += `<span class="vieta-value">${Number(result.product).toFixed(6)}</span>`;
+				html += '</div>';
+				html += '<div class="vieta-row">';
+				html += `<span class="vieta-label">Ожидаемое произведение (c/a):</span>`;
+				html += `<span class="vieta-value">${Number(result.expected_product).toFixed(6)}</span>`;
+				html += '</div>';
+
+				const verified = result.verified === true;
+				html += `<div class="verification-status ${verified ? 'verified' : 'failed'}">`;
+				html += verified ? '✓ Теорема Виета подтверждена!' : '✗ Ошибка в вычислениях';
+				html += '</div>';
+				html += '</div>';
+
+				return html;
+			}
+
+			console.error('Unknown vieta result type:', type, result);
+			return `<div class="result error">Неизвестный тип результата: ${type}</div>`;
+		}
+
+		document.getElementById('solve').addEventListener('click', solveEquation);
+		document.getElementById('solve').disabled = true;
 
 		// Подключаем Pyodide динамически
-		(function(){
+		(function () {
 			const s = document.createElement('script');
 			s.src = 'https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js';
 			s.onload = initPyodide;
